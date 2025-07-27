@@ -1,5 +1,7 @@
 package com.resumeanalyzer.service;
 
+import com.resumeanalyzer.dto.ATSAnalysisRequest;
+import com.resumeanalyzer.dto.ATSAnalysisResponse;
 import com.resumeanalyzer.dto.ResumeAnalysisResponse;
 import com.resumeanalyzer.dto.PersonalInfoDTO;
 import com.resumeanalyzer.model.Resume;
@@ -26,8 +28,16 @@ public class ResumeAnalysisServiceImpl implements ResumeAnalysisService {
     @Autowired
     private FileProcessor fileProcessor;
 
+    @Autowired
+    private ATSService atsService;
+
     @Override
     public ResumeAnalysisResponse analyzeResume(MultipartFile file) throws Exception {
+        return analyzeResume(file, null);
+    }
+
+    @Override
+    public ResumeAnalysisResponse analyzeResume(MultipartFile file, ATSAnalysisRequest atsRequest) throws Exception {
         String extractedText = fileProcessor.extractText(file);
         
         // Create Resume entity
@@ -44,7 +54,15 @@ public class ResumeAnalysisServiceImpl implements ResumeAnalysisService {
         resume = resumeRepository.save(resume);
         
         // Convert to response DTO
-        return convertToResponse(resume);
+        ResumeAnalysisResponse response = convertToResponse(resume);
+        
+        // Perform ATS analysis if job description provided
+        if (atsRequest != null && atsRequest.getJobDescription() != null && !atsRequest.getJobDescription().trim().isEmpty()) {
+            ATSAnalysisResponse atsAnalysis = atsService.analyzeATS(resume, atsRequest);
+            response.setAtsAnalysis(atsAnalysis);
+        }
+        
+        return response;
     }
 
     @Override
@@ -67,6 +85,14 @@ public class ResumeAnalysisServiceImpl implements ResumeAnalysisService {
                 .orElseThrow(() -> new Exception("Resume not found"));
         
         return nlpProcessor.calculateSkillMatch(resume, requiredSkills);
+    }
+
+    @Override
+    public ATSAnalysisResponse performATSAnalysis(Long resumeId, ATSAnalysisRequest request) throws Exception {
+        Resume resume = resumeRepository.findById(resumeId)
+                .orElseThrow(() -> new Exception("Resume not found"));
+        
+        return atsService.analyzeATS(resume, request);
     }
 
     @Override

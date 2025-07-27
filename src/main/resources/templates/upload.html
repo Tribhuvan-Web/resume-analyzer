@@ -1,220 +1,717 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Upload Resume - Resume Analyzer</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
     <style>
+      .drop-zone {
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        padding: 40px;
+        text-align: center;
+        transition: border-color 0.3s ease;
+        background-color: #f8f9fa;
+      }
+      .drop-zone:hover {
+        border-color: #007bff;
+        background-color: #e3f2fd;
+      }
+      .drop-zone.dragover {
+        border-color: #007bff;
+        background-color: #e3f2fd;
+      }
+      .result-card {
+        display: none;
+      }
+      .ats-score {
+        font-size: 2.5rem;
+        font-weight: bold;
+      }
+      .score-excellent {
+        color: #28a745;
+      }
+      .score-good {
+        color: #ffc107;
+      }
+      .score-fair {
+        color: #fd7e14;
+      }
+      .score-poor {
+        color: #dc3545;
+      }
+      .recommendation-card {
+        border-left: 4px solid;
+        margin-bottom: 1rem;
+      }
+      .priority-high {
+        border-left-color: #dc3545;
+      }
+      .priority-medium {
+        border-left-color: #ffc107;
+      }
+      .priority-low {
+        border-left-color: #28a745;
+      }
+      @media (max-width: 768px) {
         .drop-zone {
-            border: 2px dashed #ccc;
-            border-radius: 10px;
-            padding: 60px;
-            text-align: center;
-            transition: border-color 0.3s ease;
+          padding: 20px;
         }
-        .drop-zone:hover {
-            border-color: #007bff;
+        .ats-score {
+          font-size: 2rem;
         }
-        .result-card {
-            display: none;
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">Resume Analyzer</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="/">Home</a>
-                <a class="nav-link active" href="/upload">Upload Resume</a>
-            </div>
+      <div class="container">
+        <a class="navbar-brand" href="/"
+          ><i class="fas fa-chart-line me-2"></i>Resume Analyzer</a
+        >
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <div class="navbar-nav ms-auto">
+            <a class="nav-link" href="/">Home</a>
+            <a class="nav-link active" href="/upload">Upload Resume</a>
+          </div>
         </div>
+      </div>
     </nav>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-8 mx-auto">
-                <h2 class="text-center mb-4">Upload Resume for Analysis</h2>
-                
-                <div class="card">
-                    <div class="card-body">
-                        <form id="uploadForm" enctype="multipart/form-data">
-                            <div class="drop-zone mb-3" id="dropZone">
-                                <p class="mb-3">📁 Drag and drop your resume here or</p>
-                                <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt" style="display: none;">
-                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click()">Choose File</button>
-                                <p class="mt-3 text-muted small">Supported formats: PDF, DOCX, DOC, TXT (Max 10MB)</p>
-                            </div>
-                            
-                            <div id="fileInfo" style="display: none;" class="alert alert-info">
-                                <strong>Selected file:</strong> <span id="fileName"></span>
-                            </div>
-                            
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-primary btn-lg" id="uploadBtn" disabled>
-                                    <span id="uploadText">Analyze Resume</span>
-                                    <span id="uploadSpinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
-                                </button>
-                            </div>
-                        </form>
+    <div class="container mt-4">
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <h2 class="text-center mb-4">
+            <i class="fas fa-upload me-2"></i>Resume & Job Analysis
+          </h2>
+
+          <!-- Upload Form -->
+          <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-file-upload me-2"></i>Upload Resume
+              </h5>
+            </div>
+            <div class="card-body">
+              <form id="uploadForm" enctype="multipart/form-data">
+                <div class="row">
+                  <!-- Resume Upload Section -->
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Resume File</label>
+                    <div class="drop-zone" id="dropZone">
+                      <i
+                        class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"
+                      ></i>
+                      <p class="mb-3">Drag and drop your resume here or</p>
+                      <input
+                        type="file"
+                        id="fileInput"
+                        accept=".pdf,.docx,.doc,.txt"
+                        style="display: none"
+                      />
+                      <button
+                        type="button"
+                        class="btn btn-outline-primary"
+                        onclick="document.getElementById('fileInput').click()"
+                      >
+                        <i class="fas fa-folder-open me-2"></i>Choose File
+                      </button>
+                      <p class="mt-3 text-muted small">
+                        <i class="fas fa-info-circle me-1"></i>Supported: PDF,
+                        DOCX, DOC, TXT (Max 10MB)
+                      </p>
                     </div>
+
+                    <div
+                      id="fileInfo"
+                      style="display: none"
+                      class="alert alert-info mt-3"
+                    >
+                      <i class="fas fa-file me-2"></i
+                      ><strong>Selected file:</strong>
+                      <span id="fileName"></span>
+                    </div>
+                  </div>
+
+                  <!-- Job Description Section -->
+                  <div class="col-md-6">
+                    <label for="jobDescription" class="form-label fw-bold">
+                      Job Description (Optional)
+                      <small class="text-muted">- For ATS Analysis</small>
+                    </label>
+                    <textarea
+                      class="form-control"
+                      id="jobDescription"
+                      name="jobDescription"
+                      rows="8"
+                      placeholder="Paste the job description here to get ATS compatibility score and recommendations..."
+                    ></textarea>
+
+                    <div class="row mt-3">
+                      <div class="col-sm-6">
+                        <label for="jobTitle" class="form-label"
+                          >Job Title</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="jobTitle"
+                          name="jobTitle"
+                          placeholder="e.g. Software Engineer"
+                        />
+                      </div>
+                      <div class="col-sm-6">
+                        <label for="companyName" class="form-label"
+                          >Company Name</label
+                        >
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="companyName"
+                          name="companyName"
+                          placeholder="e.g. Google Inc."
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <!-- Analysis Results -->
-                <div id="resultsCard" class="card mt-4 result-card">
-                    <div class="card-header">
-                        <h5>Analysis Results</h5>
-                    </div>
-                    <div class="card-body" id="resultsContent">
-                        <!-- Results will be populated here -->
-                    </div>
+                <div class="text-center mt-4">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-lg px-5 me-3"
+                    id="uploadBtn"
+                    disabled
+                  >
+                    <span id="uploadText"
+                      ><i class="fas fa-brain me-2"></i>Analyze Resume</span
+                    >
+                    <span
+                      id="uploadSpinner"
+                      class="spinner-border spinner-border-sm ms-2"
+                      style="display: none"
+                    ></span>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-lg px-4"
+                    id="clearBtn"
+                    onclick="clearForm()"
+                  >
+                    <i class="fas fa-times me-2"></i>Clear
+                  </button>
                 </div>
+              </form>
             </div>
+          </div>
+
+          <!-- Analysis Results -->
+          <div id="resultsCard" class="card mt-4 result-card shadow-sm">
+            <div class="card-header bg-success text-white">
+              <h5 class="mb-0">
+                <i class="fas fa-chart-bar me-2"></i>Analysis Results
+              </h5>
+            </div>
+            <div class="card-body" id="resultsContent">
+              <!-- Results will be populated here -->
+            </div>
+          </div>
         </div>
+      </div>
     </div>
+
+    <!-- Templates for results -->
+    <template id="atsScoreTemplate">
+      <div class="row mb-4">
+        <div class="col-md-4 text-center">
+          <div class="card bg-light">
+            <div class="card-body">
+              <h6 class="card-title">ATS Compatibility Score</h6>
+              <div class="ats-score" id="atsScoreValue">--</div>
+              <small class="text-muted">out of 100</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-body">
+              <h6 class="card-title">Overall Feedback</h6>
+              <p id="overallFeedback" class="mb-0">--</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template id="skillMatchTemplate">
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card border-success">
+            <div class="card-header bg-success text-white">
+              <h6 class="mb-0">
+                <i class="fas fa-check-circle me-2"></i>Matching Skills
+              </h6>
+            </div>
+            <div class="card-body">
+              <div id="matchingSkillsList">--</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+              <h6 class="mb-0">
+                <i class="fas fa-exclamation-triangle me-2"></i>Missing Skills
+              </h6>
+            </div>
+            <div class="card-body">
+              <div id="missingSkillsList">--</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
+
+    <template id="recommendationTemplate">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="fas fa-lightbulb me-2"></i>Recommendations for Improvement
+          </h6>
+        </div>
+        <div class="card-body">
+          <div id="recommendationsList">--</div>
+        </div>
+      </div>
+    </template>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const uploadForm = document.getElementById('uploadForm');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const fileInfo = document.getElementById('fileInfo');
-        const fileName = document.getElementById('fileName');
-        const resultsCard = document.getElementById('resultsCard');
+      const dropZone = document.getElementById("dropZone");
+      const fileInput = document.getElementById("fileInput");
+      const uploadForm = document.getElementById("uploadForm");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const fileInfo = document.getElementById("fileInfo");
+      const fileName = document.getElementById("fileName");
+      const resultsCard = document.getElementById("resultsCard");
+      const resultsContent = document.getElementById("resultsContent");
 
-        // Drag and drop functionality
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = '#007bff';
-        });
+      // Initialize page - hide results and reset form
+      function initializePage() {
+        resultsCard.style.display = "none";
+        resultsContent.innerHTML = "";
+        fileInfo.style.display = "none";
+        uploadBtn.disabled = true;
 
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.style.borderColor = '#ccc';
-        });
+        // Reset form
+        uploadForm.reset();
+        fileInput.value = "";
 
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.style.borderColor = '#ccc';
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileInput.files = files;
-                handleFileSelect();
-            }
-        });
+        // Reset loading state
+        document.getElementById("uploadText").style.display = "inline";
+        document.getElementById("uploadSpinner").style.display = "none";
+      }
 
-        fileInput.addEventListener('change', handleFileSelect);
+      // Call initialization when page loads
+      document.addEventListener("DOMContentLoaded", initializePage);
 
-        function handleFileSelect() {
-            const file = fileInput.files[0];
-            if (file) {
-                // Validate file size (10MB limit)
-                const maxSize = 10 * 1024 * 1024; // 10MB in bytes
-                if (file.size > maxSize) {
-                    alert('File size too large. Please select a file smaller than 10MB.');
-                    fileInput.value = '';
-                    fileInfo.style.display = 'none';
-                    uploadBtn.disabled = true;
-                    return;
-                }
-                
-                // Validate file type
-                const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword', 'text/plain'];
-                if (!allowedTypes.includes(file.type)) {
-                    alert('Invalid file type. Please select a PDF, DOCX, DOC, or TXT file.');
-                    fileInput.value = '';
-                    fileInfo.style.display = 'none';
-                    uploadBtn.disabled = true;
-                    return;
-                }
-                
-                fileName.textContent = file.name;
-                fileInfo.style.display = 'block';
-                uploadBtn.disabled = false;
-            }
+      // Reset results when user selects a new file
+      function resetResults() {
+        resultsCard.style.display = "none";
+        resultsContent.innerHTML = "";
+      }
+
+      // Clear form function for the clear button
+      function clearForm() {
+        initializePage();
+      }
+
+      // Drag and drop functionality
+      dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+      });
+
+      dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+      });
+
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          resetResults(); // Reset results when file is dropped
+          handleFileSelect(files[0]);
+        }
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) {
+          resetResults(); // Reset results when new file is selected
+          handleFileSelect(e.target.files[0]);
+        }
+      });
+
+      function handleFileSelect(file) {
+        resetResults(); // Reset results when file is selected
+
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        const allowedTypes = [
+          "application/pdf",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "application/msword",
+          "text/plain",
+        ];
+
+        if (file.size > maxSize) {
+          alert("File size must be less than 10MB");
+          return;
         }
 
-        uploadForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const file = fileInput.files[0];
-            if (!file) return;
+        if (!allowedTypes.includes(file.type)) {
+          alert("Please select a PDF, DOCX, DOC, or TXT file");
+          return;
+        }
 
-            // Show loading state
-            document.getElementById('uploadText').style.display = 'none';
-            document.getElementById('uploadSpinner').style.display = 'inline-block';
-            uploadBtn.disabled = true;
+        fileName.textContent = file.name;
+        fileInfo.style.display = "block";
+        uploadBtn.disabled = false;
+      }
 
-            const formData = new FormData();
-            formData.append('file', file);
+      uploadForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-            try {
-                const response = await fetch('/api/resumes/upload', {
-                    method: 'POST',
-                    body: formData
-                });
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
 
-                if (response.ok) {
-                    const result = await response.json();
-                    displayResults(result);
-                } else {
-                    // Handle error response
-                    try {
-                        const errorData = await response.json();
-                        alert(`Error: ${errorData.message || errorData.error || 'Failed to analyze resume'}`);
-                    } catch (parseError) {
-                        // If response is not JSON, show status text
-                        alert(`Error: ${response.status} - ${response.statusText}`);
-                    }
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                // Check if it's a network error
-                if (error instanceof TypeError && error.message.includes('fetch')) {
-                    alert('Network error: Please check if the server is running and try again.');
-                } else {
-                    alert('Error uploading file. Please try again.');
-                }
-            } finally {
-                // Reset button state
-                document.getElementById('uploadText').style.display = 'inline';
-                document.getElementById('uploadSpinner').style.display = 'none';
-                uploadBtn.disabled = false;
-            }
-        });
+        const jobDescription = document
+          .getElementById("jobDescription")
+          .value.trim();
+        const jobTitle = document.getElementById("jobTitle").value.trim();
+        const companyName = document.getElementById("companyName").value.trim();
 
-        function displayResults(data) {
-            const resultsContent = document.getElementById('resultsContent');
-            
-            resultsContent.innerHTML = `
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>Personal Information</h6>
-                        <p><strong>Name:</strong> ${data.personalInfo?.fullName || 'Not found'}</p>
-                        <p><strong>Email:</strong> ${data.personalInfo?.email || 'Not found'}</p>
-                        <p><strong>Phone:</strong> ${data.personalInfo?.phoneNumber || 'Not found'}</p>
-                        <p><strong>LinkedIn:</strong> ${data.personalInfo?.linkedinUrl || 'Not found'}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>Experience Summary</h6>
-                        <p><strong>Experience:</strong> ${data.totalExperienceYears || 0} years</p>
-                        <p><strong>Seniority:</strong> ${data.seniority || 'Unknown'}</p>
-                        <p><strong>Skills Found:</strong> ${data.skills?.length || 0}</p>
-                    </div>
-                </div>
-                <div class="mt-3">
-                    <h6>Technical Skills</h6>
-                    <div class="d-flex flex-wrap gap-2">
-                        ${data.skills?.map(skill => 
-                            `<span class="badge bg-primary">${skill.name}</span>`
-                        ).join('') || '<span class="text-muted">No skills detected</span>'}
+        if (jobDescription) {
+          formData.append("jobDescription", jobDescription);
+          formData.append("jobTitle", jobTitle);
+          formData.append("companyName", companyName);
+        }
+
+        // Show loading state
+        uploadBtn.disabled = true;
+        document.getElementById("uploadText").style.display = "none";
+        document.getElementById("uploadSpinner").style.display = "inline-block";
+
+        try {
+          const response = await fetch("/api/resumes/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            displayResults(result);
+          } else {
+            throw new Error(result.message || "Upload failed");
+          }
+        } catch (error) {
+          alert("Error: " + error.message);
+          console.error("Upload error:", error);
+        } finally {
+          // Reset loading state
+          uploadBtn.disabled = false;
+          document.getElementById("uploadText").style.display = "inline";
+          document.getElementById("uploadSpinner").style.display = "none";
+        }
+      });
+
+      function displayResults(data) {
+        resultsContent.innerHTML = "";
+
+        // Show the results card
+        resultsCard.style.display = "block";
+
+        // Scroll to results
+        resultsCard.scrollIntoView({ behavior: "smooth" });
+
+        // Basic resume information
+        let html = `
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5><i class="fas fa-user me-2"></i>Resume Analysis for: ${data.fileName}</h5>
                     </div>
                 </div>
             `;
-            
-            resultsCard.style.display = 'block';
+
+        // Personal Information
+        if (data.personalInfo) {
+          html += `
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-id-card me-2"></i>Personal Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Name:</strong> ${
+                                      data.personalInfo.fullName || "N/A"
+                                    }<br>
+                                    <strong>Email:</strong> ${
+                                      data.personalInfo.email || "N/A"
+                                    }<br>
+                                    <strong>Phone:</strong> ${
+                                      data.personalInfo.phoneNumber || "N/A"
+                                    }
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>LinkedIn:</strong> ${
+                                      data.personalInfo.linkedinUrl
+                                        ? `<a href="${data.personalInfo.linkedinUrl}" target="_blank">Profile</a>`
+                                        : "N/A"
+                                    }<br>
+                                    <strong>GitHub:</strong> ${
+                                      data.personalInfo.githubUrl
+                                        ? `<a href="${data.personalInfo.githubUrl}" target="_blank">Profile</a>`
+                                        : "N/A"
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
         }
+
+        // ATS Analysis (if available)
+        if (data.atsAnalysis) {
+          html += createATSAnalysisHTML(data.atsAnalysis);
+        }
+
+        // Skills
+        if (data.skills && data.skills.length > 0) {
+          html += `
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-cogs me-2"></i>Skills</h6>
+                        </div>
+                        <div class="card-body">
+                `;
+          data.skills.forEach((skill) => {
+            html += `<span class="badge bg-primary me-2 mb-2">${skill.skillName}</span>`;
+          });
+          html += `</div></div>`;
+        }
+
+        // Experience
+        if (data.experiences && data.experiences.length > 0) {
+          html += `
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-briefcase me-2"></i>Experience (${
+                              data.totalExperienceYears || 0
+                            } years total)</h6>
+                        </div>
+                        <div class="card-body">
+                `;
+          data.experiences.forEach((exp) => {
+            html += `
+                        <div class="mb-3">
+                            <h6>${exp.jobTitle} at ${exp.company}</h6>
+                            <small class="text-muted">${
+                              exp.startDate || ""
+                            } - ${exp.endDate || "Present"}</small>
+                            ${
+                              exp.description
+                                ? `<p class="mt-2">${exp.description}</p>`
+                                : ""
+                            }
+                        </div>
+                    `;
+          });
+          html += `</div></div>`;
+        }
+
+        // Education
+        if (data.education && data.education.length > 0) {
+          html += `
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Education</h6>
+                        </div>
+                        <div class="card-body">
+                `;
+          data.education.forEach((edu) => {
+            html += `
+                        <div class="mb-3">
+                            <h6>${edu.degree} in ${edu.fieldOfStudy}</h6>
+                            <small class="text-muted">${edu.institution} - ${
+              edu.graduationYear || "N/A"
+            }</small>
+                        </div>
+                    `;
+          });
+          html += `</div></div>`;
+        }
+
+        resultsContent.innerHTML = html;
+        resultsCard.style.display = "block";
+        resultsCard.scrollIntoView({ behavior: "smooth" });
+      }
+
+      function createATSAnalysisHTML(ats) {
+        let html = `
+                <div class="card mb-4 border-info">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="fas fa-robot me-2"></i>ATS Compatibility Analysis</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-4 text-center">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">ATS Score</h6>
+                                        <div class="ats-score ${getScoreClass(
+                                          ats.atsScore
+                                        )}">${Math.round(
+          ats.atsScore || 0
+        )}</div>
+                                        <small class="text-muted">out of 100</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Overall Feedback</h6>
+                                        <p class="mb-0">${
+                                          ats.overallFeedback ||
+                                          "No feedback available"
+                                        }</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+            `;
+
+        // Skills comparison
+        if (ats.matchingSkills || ats.missingSkills) {
+          html += `
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0"><i class="fas fa-check-circle me-2"></i>Matching Skills (${
+                                      (ats.matchingSkills || []).length
+                                    })</h6>
+                                </div>
+                                <div class="card-body">
+                `;
+          if (ats.matchingSkills && ats.matchingSkills.length > 0) {
+            ats.matchingSkills.forEach((skill) => {
+              html += `<span class="badge bg-success me-1 mb-1">${skill}</span>`;
+            });
+          } else {
+            html += '<p class="text-muted mb-0">No matching skills found</p>';
+          }
+          html += `
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-warning">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Missing Skills (${
+                                      (ats.missingSkills || []).length
+                                    })</h6>
+                                </div>
+                                <div class="card-body">
+                `;
+          if (ats.missingSkills && ats.missingSkills.length > 0) {
+            ats.missingSkills.forEach((skill) => {
+              html += `<span class="badge bg-warning text-dark me-1 mb-1">${skill}</span>`;
+            });
+          } else {
+            html += '<p class="text-muted mb-0">No missing skills</p>';
+          }
+          html += `
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+        }
+
+        // Recommendations
+        if (ats.recommendations && ats.recommendations.length > 0) {
+          html += `
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Recommendations for Improvement</h6>
+                        </div>
+                        <div class="card-body">
+                `;
+          ats.recommendations.forEach((rec) => {
+            html += `
+                        <div class="recommendation-card card mb-3 priority-${rec.priority.toLowerCase()}">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    ${rec.category} 
+                                    <span class="badge bg-${getPriorityColor(
+                                      rec.priority
+                                    )} ms-2">${rec.priority}</span>
+                                </h6>
+                                <p class="card-text"><strong>Issue:</strong> ${
+                                  rec.issue
+                                }</p>
+                                <p class="card-text"><strong>Suggestion:</strong> ${
+                                  rec.suggestion
+                                }</p>
+                            </div>
+                        </div>
+                    `;
+          });
+          html += `</div></div>`;
+        }
+
+        html += `</div></div>`;
+        return html;
+      }
+
+      function getScoreClass(score) {
+        if (score >= 80) return "score-excellent";
+        if (score >= 60) return "score-good";
+        if (score >= 40) return "score-fair";
+        return "score-poor";
+      }
+
+      function getPriorityColor(priority) {
+        switch (priority.toLowerCase()) {
+          case "high":
+            return "danger";
+          case "medium":
+            return "warning";
+          case "low":
+            return "success";
+          default:
+            return "secondary";
+        }
+      }
     </script>
-</body>
+  </body>
 </html>

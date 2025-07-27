@@ -3,59 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resume Analyzer</title>
+    <title>Resume Analyzer - AI-Powered ATS Analysis</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+        }
+        .feature-card {
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .icon-large {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 0;
+            }
+            .display-4 {
+                font-size: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow">
         <div class="container">
-            <a class="navbar-brand" href="/">Resume Analyzer</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="/">Home</a>
-                <a class="nav-link" href="/upload">Upload Resume</a>
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-chart-line me-2"></i>Resume Analyzer
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link active" href="/">Home</a>
+                    <a class="nav-link" href="/upload">Upload Resume</a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-8 mx-auto text-center">
-                <h1 class="display-4">AI-Powered Resume Analyzer</h1>
-                <p class="lead">Upload your resume and get instant analysis with skill extraction, experience calculation, and match scoring.</p>
-                
-                <div class="row mt-5">
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">📄 File Processing</h5>
-                                <p class="card-text">Supports PDF, DOCX, and TXT formats with advanced text extraction.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">🧠 NLP Analysis</h5>
-                                <p class="card-text">Extract skills, experience, education, and personal information automatically.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">📊 Skill Matching</h5>
-                                <p class="card-text">Compare candidate skills with job requirements and get match scores.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-5">
-                    <a href="/upload" class="btn btn-primary btn-lg">Get Started</a>
+    <!-- Hero Section -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <h1 class="display-4 fw-bold mb-4">AI-Powered Resume & ATS Analyzer</h1>
+                    <p class="lead mb-4">
+                        Upload your resume and job description to get instant ATS compatibility analysis, 
+                        skill extraction, and personalized recommendations to improve your job application success rate.
+                    </p>
+                    <a href="/upload" class="btn btn-light btn-lg px-5">
+                        <i class="fas fa-upload me-2"></i>Start Analysis
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="fw-bold">Powerful Features</h2>
+                    <p class="text-muted">Everything you need to optimize your resume for modern hiring systems</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <div class="card feature-card shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-robot icon-large text-primary"></i>
+                            <h5 class="card-title">ATS Compatibility Score</h5>
+                            <p class="card-text">
+                                Get a detailed compatibility score showing how well your resume matches 
+                                Applicant Tracking Systems used by employers.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card feature-card shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-search icon-large text-success"></i>
+                            <h5 class="card-title">Job Matching Analysis</h5>
+                            <p class="card-text">
+                                Compare your resume against specific job descriptions to identify 
+                                matching skills and missing requirements.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card feature-card shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-lightbulb icon-large text-warning"></i>
+                            <h5 class="card-title">Smart Recommendations</h5>
+                            <p class="card-text">
+                                Receive personalized suggestions to improve your resume's effectiveness 
+                                and increase your chances of getting hired.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card feature-card shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-file-alt icon-large text-info"></i>
+                            <h5 class="card-title">Multi-Format Support</h5>
+                            <p class="card-text">
+                                Upload resumes in PDF, DOCX, DOC, or TXT formats with advanced 
+                                text extraction and processing capabilities.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card feature-card shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-cogs icon-large text-secondary"></i>
+                            <h5 class="card-title">Skill Extraction</h5>
+                            <p class="card-text">
+                                Automatically identify and categorize technical skills, soft skills, 
+                                and competencies from your resume content.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card feature-card shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <i class="fas fa-chart-bar icon-large text-danger"></i>
+                            <h5 class="card-title">Detailed Analytics</h5>
+                            <p class="card-text">
+                                Get comprehensive analysis including experience calculation, 
+                                education parsing, and professional summary generation.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-5">
+                    <h2 class="fw-bold">How It Works</h2>
+                    <p class="text-muted">Simple steps to optimize your resume</p>
+                </div>
+            </div>
+            <div class="row text-center">
+                <div class="col-lg-4 mb-4">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-upload fa-2x"></i>
+                    </div>
+                    <h5 class="mt-3">1. Upload Resume</h5>
+                    <p class="text-muted">Upload your resume and optionally add a job description you're targeting.</p>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-brain fa-2x"></i>
+                    </div>
+                    <h5 class="mt-3">2. AI Analysis</h5>
+                    <p class="text-muted">Our AI analyzes your resume for ATS compatibility and job match scoring.</p>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-star fa-2x"></i>
+                    </div>
+                    <h5 class="mt-3">3. Get Results</h5>
+                    <p class="text-muted">Receive detailed feedback and actionable recommendations for improvement.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-5 bg-primary text-white text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <h2 class="fw-bold mb-4">Ready to Optimize Your Resume?</h2>
+                    <p class="lead mb-4">
+                        Join thousands of job seekers who have improved their resume effectiveness with our AI-powered analysis.
+                    </p>
+                    <a href="/upload" class="btn btn-light btn-lg px-5">
+                        <i class="fas fa-rocket me-2"></i>Start Free Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

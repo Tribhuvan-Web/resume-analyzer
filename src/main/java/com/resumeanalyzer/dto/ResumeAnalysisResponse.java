@@ -20,4 +20,5 @@ public class ResumeAnalysisResponse {
     private Integer totalExperienceYears;
     private String seniority;
     private Double skillMatchScore;
+    private ATSAnalysisResponse atsAnalysis;
 }

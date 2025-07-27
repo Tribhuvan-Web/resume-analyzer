@@ -1,5 +1,7 @@
 package com.resumeanalyzer.controller;
 
+import com.resumeanalyzer.dto.ATSAnalysisRequest;
+import com.resumeanalyzer.dto.ATSAnalysisResponse;
 import com.resumeanalyzer.dto.ResumeAnalysisResponse;
 import com.resumeanalyzer.service.ResumeAnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +23,10 @@ public class ResumeController {
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadAndAnalyzeResume(
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "jobDescription", required = false) String jobDescription,
+            @RequestParam(value = "jobTitle", required = false) String jobTitle,
+            @RequestParam(value = "companyName", required = false) String companyName) {
         try {
             if (file.isEmpty()) {
                 Map<String, String> error = new HashMap<>();
@@ -30,11 +35,31 @@ public class ResumeController {
                 return ResponseEntity.badRequest().body(error);
             }
             
-            ResumeAnalysisResponse response = resumeAnalysisService.analyzeResume(file);
+            ATSAnalysisRequest atsRequest = null;
+            if (jobDescription != null && !jobDescription.trim().isEmpty()) {
+                atsRequest = new ATSAnalysisRequest(jobDescription, jobTitle, companyName);
+            }
+            
+            ResumeAnalysisResponse response = resumeAnalysisService.analyzeResume(file, atsRequest);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "File processing failed");
+            error.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    @PostMapping("/{id}/ats-analysis")
+    public ResponseEntity<?> performATSAnalysis(
+            @PathVariable Long id,
+            @RequestBody ATSAnalysisRequest request) {
+        try {
+            ATSAnalysisResponse response = resumeAnalysisService.performATSAnalysis(id, request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "ATS analysis failed");
             error.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(error);
         }
